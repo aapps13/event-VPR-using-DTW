@@ -10,22 +10,9 @@ import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import matplotlib.gridspec as gridspec
-from mpl_toolkits.axes_grid1 import make_axes_locatable
-from scipy.io import loadmat
-import time
-import cv2
 from PIL import Image
 import io
 import folium
-from tqdm import tqdm
-
-import _functions.subsequence_dtw_functions as subsequence_dtw_functions
-import _functions.visualisation as visualisation
-import _functions.determine_ground_truth as determine_ground_truth
-
-# data_dir = 'F:/Data/Output_Data/full_dataset/spatial_compression/resolution_[100-100]/pos_44_neg_-32_2/processed/data_1/'
-# filename = 'batch_data_1.csv'
 
 data_dir = 'C:/Users/angus/OneDrive - Australian National University/Honours/Data/Output Data/subsequence_dtw/Batch Output/original_analysis/sunset1_sunset2_0.5(1)/'
 filename = 'sunset1_sunset2_0.5_data_filtered_2.csv'
@@ -57,20 +44,15 @@ query_positions = np.asarray(query_positions).T
 estimated_positions = [df['estimated_position_0'],df['estimated_position_1']]
 estimated_positions = np.asarray(estimated_positions).T
 
-
-# plt.figure()
-# plt.scatter(estimated_positions[:,1], estimated_positions[:,0])
-# plt.scatter(query_positions[:,1], query_positions[:,0])
-# plt.show()
-
 # load the reference map
 reference_start_time = 0
 reference_end_time = 120
 reference_map = np.genfromtxt(gps_interp_dir + gps_file_dict[reference_name], delimiter=',')
 reference_path = reference_map[:,1:3]
 
-#---- Plot on Map ----#
-#---- Define map parameters ----#
+
+#---- Mapping ----#
+# Define map parameters
 map_lat = reference_path[:50,0]
 map_lon = reference_path[:50,1]
 
@@ -81,16 +63,9 @@ min_lon = min(map_lon)
 max_lon = max(map_lon)
 median_lon = np.median(map_lon)
 
-# points = np.array([[query_positions[0], query_positions[1]],
-#                    [estimated_positions[0], estimated_positions[1]]])
-
-
-#---- Mapping ----#
 # Create map
 zoom = 18
 m = folium.Map(min_zoom=zoom, max_bounds=True, location=[median_lat, median_lat], zoom_start=zoom, min_lat=min_lat, max_lat=max_lat, min_lon=min_lon, max_lon=max_lon)
-
-# Create markers
 
 # Create path
 reference_map = folium.PolyLine(locations=reference_path, color='black', weight=2, alpha=0.5)
@@ -113,13 +88,15 @@ for i in range(query_positions.shape[0]):
                        [estimated_positions[i,0], estimated_positions[i,1]]])
     linking_map = folium.PolyLine(locations=points, color='orange', weight=3)#, dash_array=[5,5])
     linking_map.add_to(m)
-m
+
 
 # Convert the map to an image
 print('Converting the map to an image')
 img_data = m._to_png(1)
 img = Image.open(io.BytesIO(img_data))
 
+
+#---- Plotting ----#
 fig, ax = plt.subplots(figsize=(12,6))
 fig.subplots_adjust(top=0.942,bottom=0.038,left=0.01,right=0.99,hspace=0.19,wspace=0.2)
 fig.suptitle("SubDTW using Spatio-Temporal Pooling: Every 10th Pixel", fontweight=suptitle_weight, fontsize=suptitle_size)
