@@ -1,4 +1,4 @@
-# Event Visual Place Recognition using Dynamic Time Warping
+# Event Camera Visual Place Recognition using Dynamic Time Warping
 This is a repository produced to store work undertaken for ENGN4350 at the Australian National University.
 
 ### Structure
